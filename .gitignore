@@ -1,0 +1,5 @@
+rodemap.txt
+node_modules
+yarn.error
+.env
+dev.ts

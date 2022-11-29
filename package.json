@@ -1,0 +1,20 @@
+{
+   "name": "desafio",
+   "version": "1.0.0",
+   "main": "index.js",
+   "license": "MIT",
+   "scripts": {
+      "dev:back": "nodemon -w ./back/index.ts -x ts-node ./back/dev.ts"
+   },
+   "dependencies": {
+      "express": "^4.18.2",
+      "parcel": "^2.8.0",
+      "typescript": "^4.9.3"
+   },
+   "devDependencies": {
+      "@types/express": "types/express",
+      "@types/node": "^18.11.9",
+      "dotenv": "^16.0.3",
+      "nodemon": "^2.0.20"
+   }
+}

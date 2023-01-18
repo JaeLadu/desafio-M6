@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import { nanoid } from "nanoid";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -7,6 +8,7 @@ const environment = process.env.ENVIRONMENT;
 const ROOT_PATH = __dirname.replace("back", "");
 
 app.use(json());
+app.use(cors());
 
 app.get("/up", (req, res) => {
    res.send(`server up and running on ${environment} mode`);
@@ -16,12 +18,12 @@ app.post("/signup", (req, res) => {
    const { name, mail } = req.body;
 
    if (!name || !mail) {
-      res.send("Information missing").status(400);
+      res.status(400).json({ message: "Information missing" });
    }
 
    //habla con la DB, crea el usuario y devuelve el ID
 
-   res.send({ userId: 1234 });
+   res.json({ id: 1234, name: "Jae", mail: "jaeladu1@gmail.com" });
 });
 
 app.post("/signin", (req, res) => {
@@ -29,14 +31,14 @@ app.post("/signin", (req, res) => {
    const dbUser = { mail: "jaeladu1@gmail.com" };
 
    if (!mail) {
-      res.send("Information missing").status(400);
+      res.status(400).json({ message: "Information missing" });
    }
 
    //habla con la DB, chequea que el usuario exista y devuelve el ID
    if (dbUser.mail == mail) {
-      res.send({ userId: 1234 });
+      res.json({ id: 1234, name: "Jae", mail: "jaeladu1@gmail.com" });
    } else {
-      res.send("User not found").status(404);
+      res.status(404).json({ message: "User not found" });
    }
 });
 
@@ -50,7 +52,7 @@ app.post("/room", (req, res) => {
    const { name, mail } = req.body;
 
    if (!name || !mail) {
-      res.send("Information missing").status(400);
+      res.status(400).send("Information missing");
    }
 
    const shortId = nanoid(4);
@@ -75,7 +77,7 @@ app.get("/rooms/:roomId", (req, res) => {
    const { mail } = req.query;
 
    if (!mail) {
-      res.send("mail missing").status(400);
+      res.status(400).send("mail missing");
    }
 
    //busca el room usando el id corto en firestore

@@ -1,3 +1,6 @@
+import { Router } from "@vaadin/router";
+import { state } from "../../state";
+
 function initStart() {
    class StartPage extends HTMLElement {
       constructor() {
@@ -15,7 +18,10 @@ function initStart() {
          newRoomButtonEl.setAttribute("text", "Nuevo Juego");
          accesRoomButtonEl.setAttribute("text", "Ingresar a una sala");
 
-         newRoomButtonEl.addEventListener("click", (e) => {});
+         newRoomButtonEl.addEventListener("click", (e) => {
+            state.createNewRoom();
+            Router.go("/share");
+         });
 
          accesRoomButtonEl.setAttribute("target", "/accesroom");
 

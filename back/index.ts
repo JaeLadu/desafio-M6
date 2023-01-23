@@ -55,21 +55,23 @@ app.post("/room", (req, res) => {
       res.status(400).send("Information missing");
    }
 
-   const shortId = nanoid(4);
-   //crea room en firebase
-   const FBID = nanoid(10);
-   //crea room en firestore y guarda todo
+   const shortId = nanoid(4); //crea room en firebase
+   const firestoreId = nanoid(10); //crea room en firestore y guarda todo
+   const firebaseId = nanoid(10); //crea room en firestore y guarda todo
 
    const room = {
-      user: {
-         name,
-         mail,
-      },
+      users: [
+         {
+            name,
+            mail,
+         },
+      ],
       shortId,
-      FBID,
+      firestoreId,
+      firebaseId,
    };
 
-   res.send({ fsId: 7890, fbId: FBID }); //id de la room en firestore y en firebase
+   res.json(room);
 });
 
 app.get("/rooms/:roomId", (req, res) => {

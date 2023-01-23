@@ -3,6 +3,7 @@ const state = {
    data: {
       user: {},
    },
+   subscribed: [],
 
    getState() {
       return this.data;
@@ -10,6 +11,10 @@ const state = {
 
    setState(newState) {
       this.data = { ...newState };
+   },
+
+   subscribe(subscriberFunction) {
+      this.subscribed.push(subscriberFunction);
    },
 
    checkLocalStorage() {
@@ -69,6 +74,24 @@ const state = {
          this.setState(state);
       }
       return data;
+   },
+
+   async createNewRoom() {
+      const oldState = this.getState();
+      const response = await fetch(`${HOST}/room`, {
+         method: "post",
+         headers: {
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify(oldState.user),
+      });
+
+      const data = await response.json();
+
+      if (data.shortId) {
+         const newState = { ...oldState, room: data };
+         this.setState(newState);
+      }
    },
 };
 

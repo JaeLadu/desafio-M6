@@ -1,5 +1,5 @@
-function initSubtitle() {
-   class Subtitle extends HTMLElement {
+function initText() {
+   class Text extends HTMLElement {
       constructor() {
          super();
       }
@@ -7,17 +7,20 @@ function initSubtitle() {
       connectedCallback() {
          if (this.isConnected) {
             const div = document.createElement("div");
-            const content = document.createElement("h2");
+            const content = document.createElement("p");
             const style = document.createElement("style");
 
-            content.innerHTML = this.textContent || "Un subtitulo";
+            content.innerHTML = this.textContent || "Un texto";
 
             style.textContent = `
-                 h2{
+                 p{
                  color: black;
-                 font-size:40px;
                  margin: 0;
                  text-align: center;
+                 font-family: 'Odibee Sans';
+                 font-style: normal;
+                 font-weight: 600;
+                 font-size: 35px;
                 }
                  `;
             div.append(content);
@@ -26,6 +29,6 @@ function initSubtitle() {
       }
    }
 
-   customElements.define("subtitle-comp", Subtitle);
+   customElements.define("text-comp", Text);
 }
-export { initSubtitle };
+export { initText };

@@ -12,6 +12,18 @@ function initRouter(root: Element) {
          path: "/start",
          component: "start-page",
       },
+      {
+         path: "/share",
+         component: "share-code-page",
+      },
+      {
+         path: "/accesroom",
+         component: "access-room-page",
+      },
+      {
+         path: "/play",
+         component: "play-page",
+      },
    ]);
 }
 

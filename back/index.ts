@@ -88,11 +88,11 @@ app.get("/rooms/:roomId", (req, res) => {
    //si no es ninguno de los dos devuelve error
    //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos
    //y devuelve el fsId
-   const fsId = 7890;
+   const firestoreId = 7890;
    //busca el fbId usando el fsId y lo devuelve
-   const fbId = 4567;
+   const firebaseId = 4567;
 
-   res.send({ fsId, fbId });
+   res.send({ firestoreId, firebaseId });
 });
 
 app.use("*", express.static(`${ROOT_PATH}/dist`));

@@ -8,6 +8,7 @@ function initStart() {
       }
 
       connectedCallback() {
+         state.disconnectUser();
          const titleEl = document.createElement("title-comp");
          titleEl.textContent =
             "Piedra, Papel <span class='ligth'>ó</span> Tijera";
@@ -18,8 +19,8 @@ function initStart() {
          newRoomButtonEl.setAttribute("text", "Nuevo Juego");
          accesRoomButtonEl.setAttribute("text", "Ingresar a una sala");
 
-         newRoomButtonEl.addEventListener("click", (e) => {
-            state.createNewRoom();
+         newRoomButtonEl.addEventListener("click", async (e) => {
+            await state.createNewRoom();
             Router.go("/share");
          });
 

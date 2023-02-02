@@ -5,3 +5,4 @@ yarn.error
 dev.ts
 .parcel-cache
 dist
+firebaseKey.json

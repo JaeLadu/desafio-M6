@@ -1,6 +1,10 @@
 import express, { json } from "express";
 import { nanoid } from "nanoid";
 import cors from "cors";
+import {
+   firebaseDatabase as firebaseDB,
+   firestoreDatabase as firestoreDB,
+} from "./database";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -178,6 +178,21 @@ const state = {
       this.setState(currentState);
       //avisa a firebase que está offline, para es es el userId
    },
+   startUserPlay(userId) {
+      const currentState = this.getState();
+      const newState = currentState;
+      newState.user.start = true;
+      this.setState(currentState);
+      //avisa a firebase que está online, para es es el userId
+   },
+
+   endUserPlay(userId) {
+      const currentState = this.getState();
+      const newState = currentState;
+      newState.user.start = false;
+      this.setState(currentState);
+      //avisa a firebase que está offline, para es es el userId
+   },
 };
 
 export { state };

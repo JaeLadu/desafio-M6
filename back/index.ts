@@ -15,88 +15,143 @@ app.use(json());
 app.use(cors());
 
 app.get("/up", (req, res) => {
-   res.send(`server up and running on ${environment} mode`);
+   return res.send(`server up and running on ${environment} mode`);
 });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
    const { name, mail } = req.body;
 
    if (!name || !mail) {
-      res.status(400).json({ message: "Information missing" });
+      return res.status(400).json({ message: "Information missing" });
    }
 
    //habla con la DB, crea el usuario y devuelve el ID
+   const firestoreId = await firestoreDB.collection("/users").add(req.body);
 
-   res.json({ id: 1234, name: "Jae", mail: "jaeladu1@gmail.com" });
+   return res.json({ id: firestoreId.id, name, mail });
 });
 
-app.post("/signin", (req, res) => {
+app.post("/signin", async (req, res) => {
    const { mail } = req.body;
-   const dbUser = { mail: "jaeladu1@gmail.com" };
 
    if (!mail) {
-      res.status(400).json({ message: "Information missing" });
+      return res.status(400).json({ message: "Information missing" });
    }
 
    //habla con la DB, chequea que el usuario exista y devuelve el ID
-   if (dbUser.mail == mail) {
-      res.json({ id: 1234, name: "Jae", mail: "jaeladu1@gmail.com" });
-   } else {
-      res.status(404).json({ message: "User not found" });
+   let user;
+   const snap = await firestoreDB.collection("/users").get();
+   snap.forEach((doc) => {
+      if (doc.data().mail == mail) {
+         user = { ...doc.data(), id: doc.id };
+      }
+   });
+
+   if (!user) {
+      return res.status(404).json({ message: "User not found" });
    }
+
+   return res.json(user);
 });
 
-app.get("/users/:userId", (req, res) => {
+app.get("/users/:userId", async (req, res) => {
    const { userId } = req.params;
 
-   res.send("All available user info");
+   const snap = await firestoreDB.collection("users").doc(`${userId}`).get();
+   const user = snap.data();
+
+   if (!snap.exists) {
+      return res.status(404).json({ message: "User not found" });
+   }
+   return res.json(user);
 });
 
-app.post("/room", (req, res) => {
-   const { name, mail } = req.body;
+app.post("/room", async (req, res) => {
+   const { name, mail, id } = req.body;
 
-   if (!name || !mail) {
-      res.status(400).send("Information missing");
+   if (!name || !mail || !id) {
+      return res.status(400).send("Information missing");
    }
 
-   const shortId = nanoid(4); //crea room en firebase
-   const firestoreId = nanoid(10); //crea room en firestore y guarda todo
-   const firebaseId = nanoid(10); //crea room en firestore y guarda todo
-
-   const room = {
+   //crea room en firebase
+   const shortId = nanoid(4);
+   const fireBaseRoom = {
       users: [
          {
+            id,
             name,
             mail,
+            owner: true,
          },
       ],
       shortId,
-      firestoreId,
-      firebaseId,
    };
 
-   res.json(room);
+   const firebaseId = await firebaseDB.ref("/rooms").push({ ...fireBaseRoom })
+      .key;
+
+   //crea room en firestore y guarda todo
+   const firestoreRoom = { ...fireBaseRoom, firebaseId };
+   const firestoreId = (
+      await firestoreDB.collection("rooms").add(firestoreRoom)
+   ).id;
+
+   const responseRoom = { ...firestoreRoom, firestoreId };
+
+   return res.json(responseRoom);
 });
 
-app.get("/rooms/:roomId", (req, res) => {
+app.get("/rooms/:roomId", async (req, res) => {
    const { roomId } = req.params;
-   const { mail } = req.query;
+   const { name, mail, id } = req.query;
 
-   if (!mail) {
-      res.status(400).send("mail missing");
+   if (!mail || !name || !id) {
+      return res.status(400).send("Information missing");
    }
 
    //busca el room usando el id corto en firestore
-   //primero debería chequear en fs que el room no tenga 2 users
-   // si los tiene, chequea que el que quiere ingresar sea uno de esos
-   //si no es ninguno de los dos devuelve error
-   //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos
-   //y devuelve el fsId
-   const firestoreId = 7890;
-   //busca el fbId usando el fsId y lo devuelve
-   const firebaseId = 4567;
+   let firestoreRoom;
+   const snap = await firestoreDB.collection("rooms").get();
+   snap.forEach((room) => {
+      if (room.data().shortId == roomId) {
+         firestoreRoom = { ...room.data(), id: room.id };
+      }
+   });
 
-   res.send({ firestoreId, firebaseId });
+   if (!firestoreRoom) {
+      return res.status(404).json({ message: "Room not found" });
+   }
+
+   //chequea en fs que el room no tenga 2 users
+   // si los tiene, chequea que el que quiere ingresar sea uno de esos
+   if (firestoreRoom && firestoreRoom.users.length == 2) {
+      const userAllowedInRoom = firestoreRoom.users.filter(
+         (user) => user.id == id
+      );
+
+      //si no es ninguno de los dos devuelve error
+      if (!userAllowedInRoom.length) {
+         return res.status(403).json("User not part of the room");
+      }
+
+      return res.send(firestoreRoom.firebaseId);
+   }
+
+   //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos y devuelve el firebase ID
+   if (firestoreRoom && firestoreRoom.users.length < 2) {
+      firestoreRoom.users.push({ name, mail, id });
+
+      firestoreDB
+         .collection("rooms")
+         .doc(firestoreRoom.id)
+         .update({ users: firestoreRoom.users });
+
+      firebaseDB
+         .ref(`rooms/${firestoreRoom.firebaseId}`)
+         .update({ users: firestoreRoom.users });
+
+      return res.send(firestoreRoom.firebaseId);
+   }
 });
 
 app.use("*", express.static(`${ROOT_PATH}/dist`));

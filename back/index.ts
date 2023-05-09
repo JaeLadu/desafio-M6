@@ -81,10 +81,10 @@ app.post("/room", async (req, res) => {
             id,
             name,
             mail,
-            owner: true,
          },
       ],
       shortId,
+      owner: id,
    };
 
    const firebaseId = await firebaseDB.ref("/rooms").push({ ...fireBaseRoom })
@@ -122,36 +122,85 @@ app.get("/rooms/:roomId", async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
    }
 
-   //chequea en fs que el room no tenga 2 users
-   // si los tiene, chequea que el que quiere ingresar sea uno de esos
-   if (firestoreRoom && firestoreRoom.users.length == 2) {
-      const userAllowedInRoom = firestoreRoom.users.filter(
-         (user) => user.id == id
-      );
+   //chequea si el usuario es parte de la room, saca el firebaseId y los users y trae la room de firebase
+   const userInRoom = firestoreRoom.users.find((user) => user.id == id);
+   let { firebaseId, users } = firestoreRoom;
+   let firebaseRoom = {
+      ...(await firebaseDB.ref(`rooms/${firebaseId}`).get()).val(),
+      firebaseId,
+   };
+   let firebaseUsers = firebaseRoom.users;
 
-      //si no es ninguno de los dos devuelve error
-      if (!userAllowedInRoom.length) {
-         return res.status(403).json("User not part of the room");
-      }
-
-      return res.send(firestoreRoom.firebaseId);
+   //si es parte de la room, devuelve el firebaseRoom
+   if (userInRoom) {
+      return res.json(firebaseRoom);
+   }
+   //si no es parte de la room y ya hay dos usuarios, devuelve un error, el usuario no es parte y no puede ingresar
+   if (!userInRoom && users.length == 2) {
+      return res.status(403).json("User not part of the room");
    }
 
-   //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos y devuelve el firebase ID
-   if (firestoreRoom && firestoreRoom.users.length < 2) {
-      firestoreRoom.users.push({ name, mail, id });
+   //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos, vuelve a traer la firebaseRoom y la devuelve
+   if (!userInRoom && users.length < 2) {
+      users.push({ name, mail, id });
+      firebaseUsers.push({ name, mail, id });
 
-      firestoreDB
-         .collection("rooms")
-         .doc(firestoreRoom.id)
-         .update({ users: firestoreRoom.users });
+      firestoreDB.collection("rooms").doc(firestoreRoom.id).update({ users });
 
-      firebaseDB
-         .ref(`rooms/${firestoreRoom.firebaseId}`)
-         .update({ users: firestoreRoom.users });
+      firebaseDB.ref(`rooms/${firebaseId}`).update({ users: firebaseUsers });
 
-      return res.send(firestoreRoom.firebaseId);
+      firebaseRoom.users = firebaseUsers;
+
+      return res.json(firebaseRoom);
    }
+});
+
+app.patch("/rooms/:roomId", async (req, res) => {
+   const { roomId } = req.params;
+   const { id, status } = req.body;
+   const roomRef = firebaseDB.ref(`rooms/${roomId}/users`);
+   const roomUsers: [any] = await (await roomRef.get()).val();
+   const user = roomUsers.find((user) => user.id == id);
+   const userIndex = roomUsers.indexOf(user);
+
+   if (userIndex == 0) {
+      roomUsers.shift();
+   }
+   if (userIndex == 1) {
+      roomUsers.pop();
+   }
+   const newUser = { ...user, ...status };
+   roomUsers.push(newUser);
+   const transaction = await roomRef.transaction(() => roomUsers);
+
+   return res.send(transaction.snapshot);
+});
+
+//crea una nueva juagada dentro de la lista de jugadas de la room que se pasa como parámetro y la setea como la jugada en curso
+app.post("/:roomId/play", async (req, res) => {
+   const { roomId } = req.params;
+   const roomRef = firebaseDB.ref(`rooms/${roomId}`);
+   const users = req.body;
+
+   const currentPlay = {
+      [users[0].id]: {
+         name: users[0].name,
+      },
+      [users[1].id]: {
+         name: users[1].name,
+      },
+      winner: "",
+   };
+
+   const playKey = await firebaseDB
+      .ref(`rooms/${roomId}/playsList`)
+      .push(currentPlay).key;
+
+   await roomRef.update({
+      currentPlay: { ...currentPlay, id: playKey },
+   });
+
+   res.status(200).send(playKey);
 });
 
 app.use("*", express.static(`${ROOT_PATH}/dist`));

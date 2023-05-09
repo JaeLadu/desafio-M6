@@ -1,18 +1,26 @@
-import { connect } from "http2";
-import { forEachChild } from "typescript";
+import { onValue, ref } from "firebase/database";
+import { firebaseDB } from "./database";
 
 const HOST = process.env.HOST || "http://localhost:3000";
 const state = {
    data: {
       user: {},
-      // room: {
-      //    users: [],
-      // },
+      room: {},
    },
    subscribed: [],
 
+   updateRoomData() {
+      onValue(ref(firebaseDB, `rooms/${this.data.room.firebaseId}`), (snap) => {
+         const data = snap.val();
+         this.data.room = { ...this.data.room, ...data };
+         this.subscribed.forEach((f) => {
+            f();
+         });
+      });
+   },
+
    getState() {
-      if (!this.data.user.name) {
+      if (!this.data.user.id) {
          this.checkLocalStorage();
       }
       return this.data;
@@ -21,7 +29,6 @@ const state = {
    setState(newState) {
       this.data = { ...newState };
       this.saveToLocalStorage();
-      console.log(this.getState());
    },
 
    subscribe(subscriberFunction) {
@@ -30,18 +37,25 @@ const state = {
 
    checkLocalStorage() {
       const localData = localStorage.getItem("multiplayerRockPaperScissors");
-      if (localData) {
-         const oldState = this.data;
-         const newState = { oldState, ...JSON.parse(localData) };
-         this.setState(newState);
+      const localObject = JSON.parse(localData);
+      if (localObject) {
+         this.data = { ...localObject };
       }
    },
 
    saveToLocalStorage() {
       localStorage.setItem(
          "multiplayerRockPaperScissors",
-         JSON.stringify(this.getState())
+         JSON.stringify(this.data)
       );
+   },
+
+   clearLocalStorage() {
+      this.data = {
+         user: {},
+         room: {},
+      };
+      this.saveToLocalStorage();
    },
 
    async signup(userData) {
@@ -82,12 +96,13 @@ const state = {
       }
       //si la respuesta es 404 o a data le falta el id significa que el usuario no existe en la base de datos, así que lo crea
       if (!data.id || response.status == 404) {
-         data = this.signup(userData);
+         data = await this.signup(userData);
       }
 
       //vuelve a checkear por el id en caso de que signup falle
       if (data.id) {
          const state = this.getState();
+         data.owner = false;
          state.user = data;
          this.setState(state);
       }
@@ -108,39 +123,49 @@ const state = {
 
       if (data.shortId) {
          const newState = { ...oldState, room: { ...data } };
+         newState.user.owner = true;
          this.setState(newState);
-         this.connectUser();
+
+         this.updateRoomData();
       }
    },
 
    async accessRoom(roomId) {
       const oldState = this.getState();
       const response = await fetch(
-         `${HOST}/rooms/${roomId}?mail=${oldState.user.mail}`
+         `${HOST}/rooms/${roomId}?name=${oldState.user.name}&mail=${oldState.user.mail}&id=${oldState.user.id}`
       );
       const data = await response.json();
 
-      if (data.firestoreId) {
+      if (response.status != 200) {
+         const newState = oldState;
+         newState.room = data;
+         this.setState(newState);
+
+         return { status: response.status, message: data };
+      }
+
+      if (data.shortId) {
          const newRoom = { ...oldState.room, ...data };
          const newState = oldState;
          newState.room = newRoom;
-
-         //CODIGO PARA PRUEBAS, ELIMINAR
-         newState.room.users[0].online = true;
-         newState.room.users.push({ name: "otro", online: true });
-         //----------------------------------
+         if (data.owner == oldState.user.id) {
+            newState.user.owner = true;
+         }
 
          this.setState(newState);
-         this.connectUser();
+
+         this.updateRoomData();
+
+         return data;
       }
-      return data;
    },
 
    checkBothUsersOnline() {
       const currentState = this.getState();
       const users = currentState.room.users;
       const usersOnline = users.filter((user) => {
-         return user.online == true;
+         return user.connected == true;
       });
 
       if (usersOnline.length > 1) {
@@ -163,35 +188,37 @@ const state = {
       }
    },
 
-   connectUser(userId) {
+   //cambia el estado del player a start:true y si el player es el owner de la room, llama al back para que cree la play
+   async startUserPlay() {
+      this.changeUserStatus({ start: true });
       const currentState = this.getState();
-      const newState = currentState;
-      newState.user.online = true;
-      this.setState(currentState);
-      //avisa a firebase que está online, para es es el userId
+
+      if (currentState.user.owner) {
+         await fetch(`${HOST}/${currentState.room.firebaseId}/play`, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(currentState.room.users),
+         });
+      }
    },
 
-   disconnectUser(userId) {
+   async changeUserStatus(status: { connected: boolean } | { start: boolean }) {
       const currentState = this.getState();
-      const newState = currentState;
-      newState.user.online = false;
-      this.setState(currentState);
-      //avisa a firebase que está offline, para es es el userId
-   },
-   startUserPlay(userId) {
-      const currentState = this.getState();
-      const newState = currentState;
-      newState.user.start = true;
-      this.setState(currentState);
-      //avisa a firebase que está online, para es es el userId
-   },
-
-   endUserPlay(userId) {
-      const currentState = this.getState();
-      const newState = currentState;
-      newState.user.start = false;
-      this.setState(currentState);
-      //avisa a firebase que está offline, para es es el userId
+      if (currentState.room.firebaseId) {
+         const response = await fetch(
+            `${HOST}/rooms/${currentState.room.firebaseId}`,
+            {
+               method: "PATCH",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+               body: JSON.stringify({ id: currentState.user.id, status }),
+            }
+         );
+         return response;
+      }
    },
 };
 

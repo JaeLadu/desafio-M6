@@ -1,19 +1,16 @@
+import { Router } from "@vaadin/router";
 import { state } from "../../state";
 
 function initShareCodePage() {
    class ShareCodePage extends HTMLElement {
       constructor() {
          super();
-      }
-
-      onBeforeEnter(location, commands, router) {
-         const usersOnline = state.checkBothUsersOnline();
-         if (usersOnline) {
-            return commands.redirect("/play");
-         }
+         state.subscribe(this.enterRoom);
       }
 
       connectedCallback() {
+         state.changeUserStatus({ connected: true, start: false });
+
          const headerEl = document.createElement("header-comp");
          const firstTextEl = document.createElement("text-comp");
          const secondTextEl = document.createElement("text-comp");
@@ -32,6 +29,15 @@ function initShareCodePage() {
             secondTextEl,
             moveSelectorEl
          );
+      }
+
+      enterRoom() {
+         const location = window.location.pathname == "/share";
+         const usersOnline = state.checkBothUsersOnline();
+
+         if (location && usersOnline) {
+            Router.go("/play");
+         }
       }
    }
 

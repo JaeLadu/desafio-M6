@@ -8,10 +8,10 @@ import { initTitle } from "./components/title";
 import { initAccessRoomPage } from "./pages/ access-room";
 import { initLogin } from "./pages/login";
 import { initPlayPage } from "./pages/play";
+import { initRoomError } from "./pages/room-error";
 import { initShareCodePage } from "./pages/share-code";
 import { initStart } from "./pages/start";
 import { initRouter } from "./router";
-import { state } from "./state";
 
 (() => {
    initTitle();
@@ -26,6 +26,7 @@ import { state } from "./state";
    initShareCodePage();
    initAccessRoomPage();
    initPlayPage();
+   initRoomError();
 
    const root =
       document.querySelector(".root") || document.createElement("div");

@@ -6,6 +6,14 @@ function initLogin() {
       constructor() {
          super();
       }
+
+      onBeforeEnter(location, commands, router) {
+         const currentState = state.getState();
+         if (currentState.user.id) {
+            return commands.redirect("/start");
+         }
+      }
+
       connectedCallback() {
          const title = document.createElement("title-comp");
          title.textContent =
@@ -20,6 +28,8 @@ function initLogin() {
             const formData = new FormData(formEl.querySelector("form"));
             formData.append("name", formData.get("Tu nombre"));
             formData.append("mail", formData.get("Tu mail"));
+            formData.delete("Tu nombre");
+            formData.delete("Tu mail");
             const data = Object.fromEntries(formData.entries());
 
             const response = await state.login(data);

@@ -24,6 +24,10 @@ function initRouter(root: Element) {
          path: "/play",
          component: "play-page",
       },
+      {
+         path: "/roomerror",
+         component: "room-error-page",
+      },
    ]);
 }
 

@@ -8,6 +8,8 @@ function initAccessRoomPage() {
       }
 
       connectedCallback() {
+         state.changeUserStatus({ connected: false });
+
          const titleEl = document.createElement("title-comp");
          titleEl.textContent =
             "Piedra, Papel <span class='ligth'>ó</span> Tijera";
@@ -24,10 +26,11 @@ function initAccessRoomPage() {
 
             const response = await state.accessRoom(data.code);
 
-            if (response.firebaseId) {
+            if (response.shortId) {
                Router.go("/share");
-            } else {
-               console.log(response.messege);
+            }
+            if (response.status) {
+               Router.go("/roomerror");
             }
          });
 

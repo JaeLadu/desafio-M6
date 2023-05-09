@@ -19,9 +19,9 @@ function initPlayPage() {
          buttonEl.addEventListener("click", (e) => {
             e.preventDefault();
 
-            state.startUserPlay(1234);
+            state.startUserPlay();
 
-            Router.go("/waitstart");
+            Router.go("/waitplay");
          });
 
          this.append(headerEl, textEl, buttonEl, moveSelectorEl);

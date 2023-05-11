@@ -1,4 +1,5 @@
 import { Router } from "@vaadin/router";
+import { state } from "../../state";
 
 function initMountPlayPage() {
    class MountPlayPage extends HTMLElement {
@@ -17,7 +18,7 @@ function initMountPlayPage() {
          moveSelector.shadowRoot?.addEventListener(
             "selected",
             (e: CustomEventInit) => {
-               console.log(e.detail);
+               state.updateCurrentPlay("", e.detail);
             }
          );
 

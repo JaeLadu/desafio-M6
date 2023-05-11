@@ -9,12 +9,16 @@ function initWaitPlayPage() {
       }
 
       connectedCallback() {
+         const currentState = state.getState();
+         const disconnectedUser = currentState.room.users.find(
+            (user) => user.start == false
+         );
          const headerEl = document.createElement("header-comp");
          const textEl = document.createElement("text-comp");
          const buttonEl = document.createElement("button-comp");
          const moveSelectorEl = document.createElement("move-selector-comp");
 
-         textEl.textContent = `Esperando a que el otro jugador presione Jugar`;
+         textEl.textContent = `Esperando a que ${disconnectedUser.name} presione Jugar`;
 
          buttonEl.setAttribute("text", "Volver");
          buttonEl.setAttribute("target", "/start");

@@ -220,6 +220,37 @@ const state = {
          return response;
       }
    },
+
+   //informa al back el movimiento que el jugador hizo o el ganador para que actualice en la base de datos
+   async updateCurrentPlay(
+      winner: string,
+      playerMove?: "piedra" | "papel" | "tijera"
+   ) {
+      const currentState = this.getState();
+      const roomId = currentState.room.firebaseId;
+      const playId = currentState.room.currentPlay.id;
+
+      //checkea que datos se le pasaron a la función para mandar el body correcto al backend
+      let body;
+      if (playerMove) {
+         body = {
+            move: playerMove,
+            player: currentState.user.id,
+         };
+      }
+      if (winner) {
+         body = { winner: winner };
+      }
+
+      await fetch(`${HOST}/${roomId}/${playId}`, {
+         method: "PATCH",
+         headers: {
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify(body),
+      });
+      return;
+   },
 };
 
 export { state };

@@ -203,6 +203,26 @@ app.post("/:roomId/play", async (req, res) => {
    res.status(200).send(playKey);
 });
 
+app.patch("/:roomId/:playId", async (req, res) => {
+   const { roomId, playId } = req.params;
+   const { move, player, winner } = req.body;
+   const roomRef = firebaseDB.ref(`rooms/${roomId}`);
+   const currentPlay = (await roomRef.child("currentPlay").get()).val();
+
+   if (winner) {
+      currentPlay.winner = winner;
+   }
+   if (move) {
+      currentPlay[player].move = move;
+   }
+
+   const transaction = await roomRef
+      .child("currentPlay")
+      .transaction(() => currentPlay);
+
+   return res.send(transaction.snapshot);
+});
+
 app.use("*", express.static(`${ROOT_PATH}/dist`));
 
 app.listen(PORT, () => console.log(`app escuchando en el puerto ${PORT}`));

@@ -28,6 +28,14 @@ function initRouter(root: Element) {
          path: "/roomerror",
          component: "room-error-page",
       },
+      {
+         path: "/waitplay",
+         component: "wait-play-page",
+      },
+      {
+         path: "/counter",
+         component: "mount-play-page",
+      },
    ]);
 }
 

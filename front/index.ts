@@ -6,11 +6,13 @@ import { initMoveSelector } from "./components/move-selector";
 import { initText } from "./components/text";
 import { initTitle } from "./components/title";
 import { initAccessRoomPage } from "./pages/ access-room";
+import { initMountPlayPage } from "./pages/counter";
 import { initLogin } from "./pages/login";
 import { initPlayPage } from "./pages/play";
 import { initRoomError } from "./pages/room-error";
 import { initShareCodePage } from "./pages/share-code";
 import { initStart } from "./pages/start";
+import { initWaitPlayPage } from "./pages/wait-play";
 import { initRouter } from "./router";
 
 (() => {
@@ -27,7 +29,8 @@ import { initRouter } from "./router";
    initAccessRoomPage();
    initPlayPage();
    initRoomError();
-
+   initWaitPlayPage();
+   initMountPlayPage();
    const root =
       document.querySelector(".root") || document.createElement("div");
 

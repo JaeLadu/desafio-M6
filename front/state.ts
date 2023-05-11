@@ -178,7 +178,7 @@ const state = {
       const currentState = this.getState();
       const users = currentState.room.users;
       const usersStart = users.filter((user) => {
-         user.start == true;
+         return user.start == true;
       });
 
       if (usersStart.length > 1) {

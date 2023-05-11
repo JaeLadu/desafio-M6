@@ -1,39 +1,45 @@
-import { handleRoute } from "../../router";
-import { state } from "../../state";
+import { Router } from "@vaadin/router";
 
-function mountPlay(root) {
-   const counter = document.createElement("counter-comp");
-   counter.addEventListener("timeUp", (e) => {
-      history.pushState({}, "", "/result");
-      handleRoute(location.pathname);
-   });
-
-   const moveSelector = document.createElement("move-selector-comp");
-   moveSelector.setAttribute("big", "yes");
-   moveSelector.shadowRoot?.addEventListener(
-      "selected",
-      (e: CustomEventInit) => {
-         state.SelectPlay(e.detail);
+function initMountPlayPage() {
+   class MountPlayPage extends HTMLElement {
+      constructor() {
+         super();
       }
-   );
 
-   const container = document.createElement("div");
-   container.classList.add("container");
+      connectedCallback() {
+         const counter = document.createElement("counter-comp");
+         counter.addEventListener("timeUp", (e) => {
+            Router.go("/result");
+         });
 
-   const style = document.createElement("style");
-   style.textContent = `
-   .container{
-      min-height: 80vh;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+         const moveSelector = document.createElement("move-selector-comp");
+         moveSelector.setAttribute("big", "yes");
+         moveSelector.shadowRoot?.addEventListener(
+            "selected",
+            (e: CustomEventInit) => {
+               console.log(e.detail);
+            }
+         );
+
+         const container = document.createElement("div");
+         container.classList.add("container");
+
+         const style = document.createElement("style");
+         style.textContent = `
+         .container{
+            min-height: 80vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+         }
+         `;
+         container.append(counter, moveSelector);
+         this.append(container, style);
+      }
    }
-   `;
 
-   root.innerHTML = "";
-   container.append(counter, moveSelector);
-   root.append(container, style);
+   customElements.define("mount-play-page", MountPlayPage);
 }
-export { mountPlay };
+export { initMountPlayPage };

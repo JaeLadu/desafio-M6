@@ -24,7 +24,9 @@ function initAccessRoomPage() {
             formData.append("code", formData.get("Código"));
             const data = Object.fromEntries(formData.entries());
 
-            const response = await state.accessRoom(data.code);
+            const response = await state.accessRoom(
+               data.code.toString().toUpperCase()
+            );
 
             if (response.shortId) {
                Router.go("/share");

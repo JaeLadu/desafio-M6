@@ -13,8 +13,21 @@ function initRoomError() {
          title.textContent =
             "Piedra, Papel <span class='ligth'>ó</span> Tijera";
 
-         const message = document.createElement("text-comp");
-         message.textContent = currentState.room;
+         //chequeo en caso de que haya más de un mensaje en la respuesta del backend
+         //si es así, agrega todos los mensajes para mostrarlos
+         let messageEl;
+         if (typeof currentState.room.message != "string") {
+            messageEl = document.createElement("div");
+
+            currentState.room.message.forEach((m) => {
+               const message = document.createElement("text-comp");
+               message.textContent = m;
+               messageEl.append(message);
+            });
+         } else {
+            messageEl = document.createElement("text-comp");
+            messageEl.textContent = currentState.room.message;
+         }
 
          const button = document.createElement("button-comp");
          button.setAttribute("text", "Volver");
@@ -49,7 +62,7 @@ function initRoomError() {
          }
          `;
 
-         container.append(title, message, button, moveSelector);
+         container.append(title, messageEl, button, moveSelector);
          this.append(container, style);
       }
    }

@@ -12,6 +12,8 @@ const state = {
    updateRoomData() {
       onValue(ref(firebaseDB, `rooms/${this.data.room.firebaseId}`), (snap) => {
          const data = snap.val();
+         console.log(data);
+
          this.data.room = { ...this.data.room, ...data };
          this.subscribed.forEach((f) => {
             f();
@@ -27,12 +29,15 @@ const state = {
    },
 
    setState(newState) {
-      this.data = { ...newState };
+      this.data = { ...this.data, ...newState };
       this.saveToLocalStorage();
    },
 
    subscribe(subscriberFunction) {
-      this.subscribed.push(subscriberFunction);
+      const alreadySubscribed = this.subscribed.find(subscriberFunction);
+      if (!alreadySubscribed) {
+         this.subscribed.push(subscriberFunction);
+      }
    },
 
    checkLocalStorage() {
@@ -164,11 +169,9 @@ const state = {
    checkBothUsersOnline() {
       const currentState = this.getState();
       const users = currentState.room.users;
-      const usersOnline = users.filter((user) => {
-         return user.connected == true;
-      });
+      const userMissing = users.find((user) => user.connected == false);
 
-      if (usersOnline.length > 1) {
+      if (!userMissing && users.length > 1) {
          return true;
       } else {
          return false;
@@ -177,11 +180,9 @@ const state = {
    checkBothUsersStart() {
       const currentState = this.getState();
       const users = currentState.room.users;
-      const usersStart = users.filter((user) => {
-         return user.start == true;
-      });
+      const userMissing = users.find((user) => user.start == false);
 
-      if (usersStart.length > 1) {
+      if (!userMissing && users.length > 1) {
          return true;
       } else {
          return false;
@@ -249,6 +250,56 @@ const state = {
          },
          body: JSON.stringify(body),
       });
+      return;
+   },
+
+   async setWinner() {
+      const currentState = this.getState();
+      if (currentState.user.owner) {
+         const resultsMap = {
+            piedra: {
+               piedra: "tie",
+               papel: "lose",
+               tijera: "win",
+            },
+            papel: {
+               piedra: "win",
+               papel: "tie",
+               tijera: "lose",
+            },
+            tijera: {
+               piedra: "lose",
+               papel: "win",
+               tijera: "tie",
+            },
+         };
+
+         //define el id del user local y el del oponente
+         const user = currentState.user.id;
+         const opponent = currentState.room.users.find((u) => u.id !== user).id;
+         //usa los ids para definir las jugadas que hizo cada uno, buscandolas en la partida actual
+         const userMove = currentState.room.currentPlay[user].move;
+         const opponentMove = currentState.room.currentPlay[opponent].move;
+         //usa las jugadas de cada uno para definir si el user local es el ganador, perdedor, o si hay un empate en la partida actual
+         const result = resultsMap[userMove][opponentMove];
+
+         let winner;
+
+         //acualiza la base de datos con los datos del ganador
+         if (result == "win") {
+            winner = user;
+         }
+         if (result == "lose") {
+            winner = opponent;
+         }
+         if (result == "tie") {
+            winner = "tie";
+         }
+
+         await this.updateCurrentPlay(winner);
+         return winner;
+      }
+      await this.updateCurrentPlay("");
       return;
    },
 };

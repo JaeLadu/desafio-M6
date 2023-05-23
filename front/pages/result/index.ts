@@ -1,66 +1,69 @@
+import { Router } from "@vaadin/router";
+import { state } from "../../state";
+
 const piedraImg = require("../../elements/piedra.svg");
 const papelImg = require("../../elements/papel.svg");
 const tijeraImg = require("../../elements/tijera.svg");
-import { handleRoute } from "../../router";
-import { state } from "../../state";
 
-function mountResult(root) {
-   setTimeout(() => {
-      history.pushState({}, "", "/score");
-      handleRoute(location.pathname);
-   }, 2000);
+const movesMap = {
+   piedra: piedraImg,
+   papel: papelImg,
+   tijera: tijeraImg,
+};
 
-   const result = state.getResult();
+function initResultPage() {
+   class ResultPage extends HTMLElement {
+      constructor() {
+         super();
+      }
 
-   const container = document.createElement("div");
-   container.classList.add("container");
+      connectedCallback() {
+         //Este timer determina que esta pantalla sólo va a ser visible por un cierto tiempo, después el router lleva a los usuarios a /score
+         //esto es porque esta pantalla es únicamente para mostrar la jugada que eligió cada unos de los usuarios
+         setTimeout(() => {
+            Router.go("/score");
+         }, 2000);
 
-   const computerMove = document.createElement("img");
-   computerMove.classList.add("computer");
+         const currentState = state.getState();
+         const { currentPlay } = currentState.room;
+         const user = currentState.user.id;
+         //filtra en la lista de usuarios de la room, al que no es el mismo que el usuario local y guarda su id en una constante
+         const opponent = currentState.room.users.find((u) => u.id !== user).id;
 
-   if (result["computerMove"] == "piedra") {
-      computerMove.setAttribute("src", piedraImg);
-   }
-   if (result["computerMove"] == "papel") {
-      computerMove.setAttribute("src", papelImg);
-   }
-   if (result["computerMove"] == "tijera") {
-      computerMove.setAttribute("src", tijeraImg);
-   }
+         const container = document.createElement("div");
+         container.classList.add("container");
 
-   const playerMove = document.createElement("img");
-   playerMove.classList.add("player");
+         const opponentMove = document.createElement("img");
+         opponentMove.classList.add("opponent");
+         opponentMove.setAttribute("src", movesMap[currentPlay[opponent].move]);
 
-   if (result["playerMove"] == "piedra") {
-      playerMove.setAttribute("src", piedraImg);
-   }
-   if (result["playerMove"] == "papel") {
-      playerMove.setAttribute("src", papelImg);
-   }
-   if (result["playerMove"] == "tijera") {
-      playerMove.setAttribute("src", tijeraImg);
-   }
+         const userMove = document.createElement("img");
+         userMove.classList.add("user");
 
-   const style = document.createElement("style");
+         userMove.setAttribute("src", movesMap[currentPlay[user].move]);
 
-   style.textContent = `
+         const style = document.createElement("style");
+
+         style.textContent = `
    .container{
-    width:100%;
+      width:100%;
    }
-    .computer{
-       height:50vh;
-       position: absolute;
-       top: -15px;
-       transform: rotate(180deg);
-    }
-    .player{
-       height:50vh;
-       position: absolute;
-    bottom: -15px;
+   .opponent{
+      height:50vh;
+      position: absolute;
+      top: -15px;
+      transform: rotate(180deg);
+   }
+   .user{
+      height:50vh;
+      position: absolute;
+      bottom: -15px;
    }
    `;
 
-   root.innerHTML = "";
-   root.append(computerMove, playerMove, style);
+         this.append(opponentMove, userMove, style);
+      }
+   }
+   customElements.define("result-page", ResultPage);
 }
-export { mountResult };
+export { initResultPage };

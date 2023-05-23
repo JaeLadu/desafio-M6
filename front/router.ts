@@ -36,6 +36,14 @@ function initRouter(root: Element) {
          path: "/counter",
          component: "mount-play-page",
       },
+      {
+         path: "/result",
+         component: "result-page",
+      },
+      {
+         path: "/score",
+         component: "score-page",
+      },
    ]);
 }
 

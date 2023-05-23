@@ -9,7 +9,9 @@ import { initAccessRoomPage } from "./pages/ access-room";
 import { initMountPlayPage } from "./pages/counter";
 import { initLogin } from "./pages/login";
 import { initPlayPage } from "./pages/play";
+import { initResultPage } from "./pages/result";
 import { initRoomError } from "./pages/room-error";
+import { initScorePage } from "./pages/score";
 import { initShareCodePage } from "./pages/share-code";
 import { initStart } from "./pages/start";
 import { initWaitPlayPage } from "./pages/wait-play";
@@ -31,6 +33,8 @@ import { initRouter } from "./router";
    initRoomError();
    initWaitPlayPage();
    initMountPlayPage();
+   initResultPage();
+   initScorePage();
    const root =
       document.querySelector(".root") || document.createElement("div");
 

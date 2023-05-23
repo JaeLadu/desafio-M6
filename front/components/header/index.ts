@@ -13,14 +13,19 @@ function initHeader() {
          const scoreEl = document.createElement("div");
          const roomCodeEl = document.createElement("div");
          const style = document.createElement("style");
+         let owner;
+         if (currentState.user.owner) {
+            owner = currentState.user.id;
+         } else {
+            owner = currentState.room.users.find(
+               (u) => u.id !== currentState.user.id
+            ).id;
+         }
 
-         currentState.room.users?.forEach((user, index) => {
+         currentState.room.users.forEach((user) => {
             const spanEl = document.createElement("span");
-            const score = currentState.room.score
-               ? currentState.room.score[user]
-               : 0;
-            spanEl.textContent = `${user.name}: ${score}`;
-            if (index === 0) {
+            spanEl.textContent = `${user.name}: ${user.score || 0}`;
+            if (user.id == owner) {
                spanEl.classList.add("owner");
             }
             scoreEl.append(spanEl);

@@ -6,3 +6,4 @@ dev.ts
 .parcel-cache
 dist
 firebaseKey.json
+.vscode

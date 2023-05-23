@@ -7,14 +7,17 @@ function initForm() {
          const formEl = document.createElement("form");
          const fields = this.getAttribute("fields").split(",");
 
-         fields.forEach((f) => {
+         fields.forEach((field, index) => {
             const labelEl = document.createElement("label");
             const titleEl = document.createElement("span");
             const inputEl = document.createElement("input");
 
-            titleEl.textContent = f;
+            titleEl.textContent = field;
             inputEl.type = "text";
-            inputEl.name = f;
+            inputEl.name = field;
+            if (index == 0) {
+               inputEl.autofocus = true;
+            }
 
             labelEl.append(titleEl, inputEl);
             formEl.append(labelEl);

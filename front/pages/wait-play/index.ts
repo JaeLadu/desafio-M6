@@ -6,6 +6,7 @@ function initWaitPlayPage() {
       constructor() {
          super();
          state.subscribe(this.startPlay);
+         state.subscribe(() => this.connectedCallback);
       }
 
       connectedCallback() {

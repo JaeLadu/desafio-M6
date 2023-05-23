@@ -203,24 +203,45 @@ app.post("/:roomId/play", async (req, res) => {
    res.status(200).send(playKey);
 });
 
+//recibe información sobre las jugadas, tanto la selección de cualquiera de los jugadores (piedra, papel o tijera), cómo quien es el ganador
+//usa esta info para actualizar firebase
 app.patch("/:roomId/:playId", async (req, res) => {
    const { roomId, playId } = req.params;
    const { move, player, winner } = req.body;
    const roomRef = firebaseDB.ref(`rooms/${roomId}`);
    const currentPlay = (await roomRef.child("currentPlay").get()).val();
+   let users = (await roomRef.child("users").get()).val();
 
    if (winner) {
       currentPlay.winner = winner;
+      if (winner != "tie") {
+         //antes de actualizar el score se asegura de que ambos usuarios tengan una key "score"
+         const scoreMissing = users.find((u) => !("score" in u));
+         if (scoreMissing) {
+            users = users.map((u) => ({ ...u, score: 0 }));
+         }
+         //busca el index del usuario que ganó
+         const winnerIndex = users.findIndex((u) => u.id == winner);
+
+         //actualiza el score del winner
+         users[winnerIndex].score++;
+         await roomRef.child("users").transaction(() => users);
+      }
    }
    if (move) {
       currentPlay[player].move = move;
    }
 
-   const transaction = await roomRef
+   const currentPlayTransaction = await roomRef
       .child("currentPlay")
       .transaction(() => currentPlay);
 
-   return res.send(transaction.snapshot);
+   await roomRef
+      .child("playsList")
+      .child(currentPlay.id)
+      .transaction(() => currentPlay);
+
+   return res.send(currentPlayTransaction.snapshot);
 });
 
 app.use("*", express.static(`${ROOT_PATH}/dist`));

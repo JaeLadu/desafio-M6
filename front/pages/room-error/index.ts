@@ -9,8 +9,8 @@ function initRoomError() {
 
       connectedCallback() {
          const currentState = state.getState();
-         const title = document.createElement("title-comp");
-         title.textContent =
+         const titleEl = document.createElement("title-comp");
+         titleEl.textContent =
             "Piedra, Papel <span class='ligth'>ó</span> Tijera";
 
          //chequeo en caso de que haya más de un mensaje en la respuesta del backend
@@ -29,9 +29,9 @@ function initRoomError() {
             messageEl.textContent = currentState.room.message;
          }
 
-         const button = document.createElement("button-comp");
-         button.setAttribute("text", "Volver");
-         button.setAttribute("target", "/accesroom");
+         const backButtonEl = document.createElement("button-comp");
+         backButtonEl.setAttribute("text", "Volver");
+         backButtonEl.setAttribute("target", "/accesroom");
 
          const moveSelector = document.createElement("move-selector-comp");
 
@@ -53,7 +53,7 @@ function initRoomError() {
             .container{
                width: 375px;
             }
-            button-comp{
+            backButtonEl-comp{
                width: 100%
             }
             move-selector-comp{
@@ -62,7 +62,7 @@ function initRoomError() {
          }
          `;
 
-         container.append(title, messageEl, button, moveSelector);
+         container.append(titleEl, messageEl, backButtonEl, moveSelector);
          this.append(container, style);
       }
    }

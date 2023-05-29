@@ -36,7 +36,11 @@ function initAccessRoomPage() {
             }
          });
 
-         this.append(titleEl, formEl);
+         const backButtonEl = document.createElement("button-comp");
+         backButtonEl.setAttribute("text", "Volver");
+         backButtonEl.setAttribute("target", "/start");
+
+         this.append(titleEl, formEl, backButtonEl);
       }
    }
    customElements.define("access-room-page", AccessRoomPage);

@@ -12,9 +12,10 @@ const state = {
    updateRoomData() {
       onValue(ref(firebaseDB, `rooms/${this.data.room.firebaseId}`), (snap) => {
          const data = snap.val();
-         console.log(data);
-
-         this.data.room = { ...this.data.room, ...data };
+         const currentState = this.getState();
+         const newState = currentState;
+         newState.room = { ...currentState.room, ...data };
+         this.setState(newState);
          this.subscribed.forEach((f) => {
             f();
          });
@@ -97,7 +98,7 @@ const state = {
 
       //si la respuesta es 400 significa que faltan datos, devuelve un mensaje diciendo eso
       if (response.status == 400) {
-         return data.message;
+         return data;
       }
       //si la respuesta es 404 o a data le falta el id significa que el usuario no existe en la base de datos, así que lo crea
       if (!data.id || response.status == 404) {
@@ -281,7 +282,18 @@ const state = {
          const userMove = currentState.room.currentPlay[user].move;
          const opponentMove = currentState.room.currentPlay[opponent].move;
          //usa las jugadas de cada uno para definir si el user local es el ganador, perdedor, o si hay un empate en la partida actual
-         const result = resultsMap[userMove][opponentMove];
+         let result;
+         if (userMove && opponentMove) {
+            result = resultsMap[userMove][opponentMove];
+         }
+         if (userMove) {
+            result = "win";
+         }
+         if (opponentMove) {
+            result = "lose";
+         } else {
+            result = "tie";
+         }
 
          let winner;
 

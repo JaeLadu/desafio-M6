@@ -1,7 +1,8 @@
 import { state } from "../../state";
 
-const greenStar = require("../../elements/ganaste.svg");
-const redStar = require("../../elements/perdiste.svg");
+const greenStarEl = require("../../elements/ganaste.svg");
+const redStarEl = require("../../elements/perdiste.svg");
+const blueStarEl = require("../../elements/empateAzul.svg");
 
 function initScorePage() {
    class ScorePage extends HTMLElement {
@@ -17,12 +18,15 @@ function initScorePage() {
 
          const container = document.createElement("div");
          container.classList.add("result-container");
-         const star = document.createElement("img");
-         star.classList.add("star");
+         const starEl = document.createElement("img");
+         starEl.classList.add("star");
+         if (winner == "tie") {
+            starEl.src = blueStarEl;
+         }
          if (winner == currentState.user.id) {
-            star.src = greenStar;
+            starEl.src = greenStarEl;
          } else {
-            star.src = redStar;
+            starEl.src = redStarEl;
          }
 
          let owner;
@@ -117,7 +121,7 @@ function initScorePage() {
               }
           }
           `;
-         container.append(star, scoreEl, playAgainButtonEl, exitButtonEl);
+         container.append(starEl, scoreEl, playAgainButtonEl, exitButtonEl);
          this.append(container, style);
       }
    }

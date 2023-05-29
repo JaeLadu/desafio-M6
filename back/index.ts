@@ -163,7 +163,11 @@ app.get("/rooms/:roomId", async (req, res) => {
    }
    //si no es parte de la room y ya hay dos usuarios, devuelve un error, el usuario no es parte y no puede ingresar
    if (!userInRoom && users.length == 2) {
-      return res.status(403).json("User not part of the room");
+      return res
+         .status(403)
+         .json({
+            message: ["No pertenecés a esta room", "User not part of the room"],
+         });
    }
 
    //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos, vuelve a traer la firebaseRoom y la devuelve

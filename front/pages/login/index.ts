@@ -5,6 +5,7 @@ function initLogin() {
    class LoginPage extends HTMLElement {
       constructor() {
          super();
+         state.subscribe(() => this.connectedCallback);
       }
 
       onBeforeEnter(location, commands, router) {
@@ -27,7 +28,10 @@ function initLogin() {
 
             const formData = new FormData(formEl.querySelector("form"));
             formData.append("name", formData.get("Tu nombre"));
-            formData.append("mail", formData.get("Tu mail"));
+            formData.append(
+               "mail",
+               formData.get("Tu mail").toString().toLocaleLowerCase()
+            );
             formData.delete("Tu nombre");
             formData.delete("Tu mail");
             const data = Object.fromEntries(formData.entries());
@@ -37,7 +41,14 @@ function initLogin() {
             if (response.id) {
                Router.go("/start");
             } else {
-               console.log(response.messege);
+               let errorMessageEl = formEl.querySelector(".error-message");
+               if (errorMessageEl) {
+                  formEl.removeChild(errorMessageEl);
+               }
+               errorMessageEl = document.createElement("span");
+               errorMessageEl.classList.add("error-message");
+               errorMessageEl.textContent = `Asegurate de haber completado todos los campos ${response.message}`;
+               formEl.appendChild(errorMessageEl);
             }
          });
 

@@ -15,18 +15,22 @@ function initShareCodePage() {
          const firstTextEl = document.createElement("text-comp");
          const secondTextEl = document.createElement("text-comp");
          const codeEl = document.createElement("h3");
+         const backButtonEl = document.createElement("button-comp");
          const moveSelectorEl = document.createElement("move-selector-comp");
          const currentState = state.getState();
 
          firstTextEl.textContent = "Compartí el código:";
          codeEl.textContent = currentState.room.shortId;
          secondTextEl.textContent = "Con tu contrincante";
+         backButtonEl.setAttribute("text", "Volver");
+         backButtonEl.setAttribute("target", "/start");
 
          this.append(
             headerEl,
             firstTextEl,
             codeEl,
             secondTextEl,
+            backButtonEl,
             moveSelectorEl
          );
       }

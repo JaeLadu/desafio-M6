@@ -17,24 +17,28 @@ function initAccessRoomPage() {
          const formEl = document.createElement("form-comp");
          formEl.setAttribute("fields", "Código");
          formEl.setAttribute("button", "Ingresar a la sala");
-         formEl.addEventListener("submit", async (e) => {
-            e.preventDefault();
+         formEl.shadowRoot.addEventListener(
+            "customSubmit",
+            async (e: CustomEvent) => {
+               // e.preventDefault();
 
-            const formData = new FormData(formEl.querySelector("form"));
-            formData.append("code", formData.get("Código"));
-            const data = Object.fromEntries(formData.entries());
+               // const formData = new FormData(formEl.querySelector("form"));
+               const formData = e.detail;
+               formData.append("code", formData.get("Código"));
+               const data = Object.fromEntries(formData.entries());
 
-            const response = await state.accessRoom(
-               data.code.toString().toUpperCase()
-            );
+               const response = await state.accessRoom(
+                  data.code.toString().toUpperCase()
+               );
 
-            if (response.shortId) {
-               Router.go("/share");
+               if (response.shortId) {
+                  Router.go("/share");
+               }
+               if (response.status) {
+                  Router.go("/roomerror");
+               }
             }
-            if (response.status) {
-               Router.go("/roomerror");
-            }
-         });
+         );
 
          const backButtonEl = document.createElement("button-comp");
          backButtonEl.setAttribute("text", "Volver");

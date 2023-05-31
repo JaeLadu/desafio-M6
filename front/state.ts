@@ -192,7 +192,6 @@ const state = {
 
    //cambia el estado del player a start:true y si el player es el owner de la room, llama al back para que cree la play
    async startUserPlay() {
-      this.changeUserStatus({ start: true });
       const currentState = this.getState();
 
       if (currentState.user.owner) {
@@ -286,11 +285,11 @@ const state = {
          if (userMove && opponentMove) {
             result = resultsMap[userMove][opponentMove];
          }
-         if (userMove) {
-            result = "win";
-         }
-         if (opponentMove) {
+         if (!userMove) {
             result = "lose";
+         }
+         if (!opponentMove) {
+            result = "win";
          } else {
             result = "tie";
          }

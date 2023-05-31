@@ -3,8 +3,22 @@ function initForm() {
       constructor() {
          super();
       }
+      shadow = this.attachShadow({ mode: "open" });
       connectedCallback() {
          const formEl = document.createElement("form");
+
+         formEl.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(formEl);
+            const customEvent = new CustomEvent("customSubmit", {
+               bubbles: true,
+               detail: formData,
+            });
+
+            formEl.dispatchEvent(customEvent);
+         });
+
          const fields = this.getAttribute("fields").split(",");
 
          fields.forEach((field, index) => {
@@ -28,13 +42,43 @@ function initForm() {
 
          const style = document.createElement("style");
          style.textContent = `
-         label, span{
+         label{
             display: block;
+            margin-bottom: 20px;
+         }
+         span{
+            display:block;
+            font-family: 'Odibee Sans';
+            font-size: 45px;
+         }
+         input{
+            font-family: 'Odibee Sans';
+            font-size: 35px;
+            border: 10px solid #182460;
+            border-radius: 10px;
+            max-height: 85px;
+            padding: 17px;
+            box-sizing:border-box;
+            width: 100%;
+         }
+         button{
+               background-color: #006CFC;
+               border: 10px solid #001997;
+               border-radius: 10px;
+               width: 100%;
+               max-height: 85px;
+               padding: 17px;
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               font-family: 'Odibee Sans', cursive;
+               font-size: 45px;
+               color: #D8FCFC;
          }
          `;
 
          formEl.append(buttonEl);
-         this.append(formEl, style);
+         this.shadow.append(formEl, style);
       }
    }
 

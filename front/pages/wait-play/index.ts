@@ -6,12 +6,14 @@ function initWaitPlayPage() {
       constructor() {
          super();
          state.subscribe(this.startPlay);
-         state.subscribe(() => this.connectedCallback);
       }
 
-      connectedCallback() {
+      async connectedCallback() {
+         await state.changeUserStatus({ start: true });
+         this.startPlay();
          const currentState = state.getState();
          const opponent = currentState.room.users.find((user) => !user.owner);
+
          const headerEl = document.createElement("header-comp");
          const textEl = document.createElement("text-comp");
          const buttonEl = document.createElement("button-comp");

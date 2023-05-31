@@ -40,9 +40,9 @@ app.post("/signup", async (req, res) => {
 
 //método para validar usuarios en la base de datos
 app.post("/signin", async (req, res) => {
-   const { mail } = req.body;
+   const { mail, name } = req.body;
 
-   if (!mail) {
+   if (!mail || !name) {
       return res.status(400).json({ message: "Information missing" });
    }
 
@@ -163,11 +163,9 @@ app.get("/rooms/:roomId", async (req, res) => {
    }
    //si no es parte de la room y ya hay dos usuarios, devuelve un error, el usuario no es parte y no puede ingresar
    if (!userInRoom && users.length == 2) {
-      return res
-         .status(403)
-         .json({
-            message: ["No pertenecés a esta room", "User not part of the room"],
-         });
+      return res.status(403).json({
+         message: ["No pertenecés a esta room", "User not part of the room"],
+      });
    }
 
    //si la room no tiene 2 usuarios, agrega este a la room en ambas bases de datos, vuelve a traer la firebaseRoom y la devuelve

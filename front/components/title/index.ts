@@ -13,10 +13,14 @@ function initTitle() {
             content.innerHTML = this.textContent || "Un titulo";
 
             style.textContent = `
+            div{
+               max-width:290px;
+            }
                 h1{
-                color: #009048;
-                font-size:80px;
-                margin: 0;
+                   color: #009048;
+                   font-size:80px;
+                   margin: 0;
+                font-family: 'Roboto Slab'
                }
                
                h1>span.ligth{

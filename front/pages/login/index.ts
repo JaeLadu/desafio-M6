@@ -23,34 +23,38 @@ function initLogin() {
          const formEl = document.createElement("form-comp");
          formEl.setAttribute("fields", "Tu nombre,Tu mail");
          formEl.setAttribute("button", "Ingresar");
-         formEl.addEventListener("submit", async (e) => {
-            e.preventDefault();
+         //escucho un evento custom porque el elemento form-comp está dentro de un shadow
+         formEl.shadowRoot.addEventListener(
+            "customSubmit",
+            async (e: CustomEvent) => {
+               //form-comp manda el formData dentro del detalle del evento custom
+               const formData = e.detail;
+               formData.append("name", formData.get("Tu nombre"));
+               formData.append(
+                  "mail",
+                  formData.get("Tu mail").toString().toLocaleLowerCase()
+               );
+               formData.delete("Tu nombre");
+               formData.delete("Tu mail");
+               const data = Object.fromEntries(formData.entries());
 
-            const formData = new FormData(formEl.querySelector("form"));
-            formData.append("name", formData.get("Tu nombre"));
-            formData.append(
-               "mail",
-               formData.get("Tu mail").toString().toLocaleLowerCase()
-            );
-            formData.delete("Tu nombre");
-            formData.delete("Tu mail");
-            const data = Object.fromEntries(formData.entries());
+               const response = await state.login(data);
 
-            const response = await state.login(data);
-
-            if (response.id) {
-               Router.go("/start");
-            } else {
-               let errorMessageEl = formEl.querySelector(".error-message");
-               if (errorMessageEl) {
-                  formEl.removeChild(errorMessageEl);
+               if (response.id) {
+                  Router.go("/start");
+               } else {
+                  let errorMessageEl =
+                     formEl.shadowRoot.querySelector(".error-message");
+                  if (errorMessageEl) {
+                     formEl.shadowRoot.removeChild(errorMessageEl);
+                  }
+                  errorMessageEl = document.createElement("span");
+                  errorMessageEl.classList.add("error-message");
+                  errorMessageEl.innerHTML = `Asegurate de haber completado todos los campos<br>${response.message}`;
+                  formEl.shadowRoot.appendChild(errorMessageEl);
                }
-               errorMessageEl = document.createElement("span");
-               errorMessageEl.classList.add("error-message");
-               errorMessageEl.textContent = `Asegurate de haber completado todos los campos ${response.message}`;
-               formEl.appendChild(errorMessageEl);
             }
-         });
+         );
 
          const moveSelector = document.createElement("move-selector-comp");
 
@@ -59,22 +63,22 @@ function initLogin() {
 
          const style = document.createElement("style");
          style.textContent = `
-         .container{
-            min-height: 80vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            justify-content: space-between;
-            gap: 5vh;
-         }
-         @media screen and (min-width: 400px){
             .container{
-               width: 375px;
+               min-height: 80vh;
+               width: 100%;
+               display: flex;
+               flex-direction: column; 
+               align-items: center;
+               justify-content: space-between;
+               gap: 5vh;
             }
-            button-comp{
-               width: 100%
-            }
+            @media screen and (min-width: 400px){
+               .container{
+                  width: 375px;
+               }
+               form-comp{
+                  width: 100%
+               }
             move-selector-comp{
                width: 100%
             }

@@ -15,15 +15,14 @@ function initScorePage() {
          await state.setWinner();
          const currentState = state.getState();
          const winner = currentState.room.currentPlay.winner;
-
          const container = document.createElement("div");
          container.classList.add("result-container");
+
          const starEl = document.createElement("img");
          starEl.classList.add("star");
          if (winner == "tie") {
             starEl.src = blueStarEl;
-         }
-         if (winner == currentState.user.id) {
+         } else if (winner == currentState.user.id) {
             starEl.src = greenStarEl;
          } else {
             starEl.src = redStarEl;
@@ -68,6 +67,8 @@ function initScorePage() {
               background-color: ${
                  winner == currentState.user.id
                     ? "rgba(136, 137, 73, 0.9)"
+                    : winner == "tie"
+                    ? "rgba(0, 108, 150, 1)"
                     : "rgba(137, 73, 73, 0.9)"
               };
                   position: absolute;

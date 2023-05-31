@@ -8,6 +8,13 @@ function initShareCodePage() {
          state.subscribe(this.enterRoom);
       }
 
+      onBeforeEnter() {
+         const { databaseConnection } = state.getState();
+         if (!databaseConnection) {
+            state.updateRoomData();
+         }
+      }
+
       connectedCallback() {
          state.changeUserStatus({ connected: true, start: false });
 

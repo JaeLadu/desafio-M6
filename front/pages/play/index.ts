@@ -7,6 +7,15 @@ function initPlayPage() {
          super();
       }
 
+      onBeforeEnter() {
+         const { databaseConnection } = state.getState();
+         console.log(databaseConnection);
+
+         if (!databaseConnection) {
+            state.updateRoomData();
+         }
+      }
+
       connectedCallback() {
          const headerEl = document.createElement("header-comp");
          const textEl = document.createElement("text-comp");

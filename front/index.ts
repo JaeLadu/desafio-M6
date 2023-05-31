@@ -16,6 +16,7 @@ import { initShareCodePage } from "./pages/share-code";
 import { initStart } from "./pages/start";
 import { initWaitPlayPage } from "./pages/wait-play";
 import { initRouter } from "./router";
+import { state } from "./state";
 
 (() => {
    initTitle();
@@ -39,4 +40,10 @@ import { initRouter } from "./router";
       document.querySelector(".root") || document.createElement("div");
 
    initRouter(root);
+   window.addEventListener("beforeunload", () => {
+      console.log("unload");
+      const currentState = state.getState();
+      currentState.databaseConnection = false;
+      state.setState(currentState);
+   });
 })();

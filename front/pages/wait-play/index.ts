@@ -8,6 +8,13 @@ function initWaitPlayPage() {
          state.subscribe(this.startPlay);
       }
 
+      onBeforeEnter() {
+         const { databaseConnection } = state.getState();
+         if (!databaseConnection) {
+            state.updateRoomData();
+         }
+      }
+
       async connectedCallback() {
          await state.changeUserStatus({ start: true });
          this.startPlay();

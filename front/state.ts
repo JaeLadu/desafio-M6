@@ -6,20 +6,25 @@ const state = {
    data: {
       user: {},
       room: {},
+      databaseConnection: false,
    },
    subscribed: [],
 
    updateRoomData() {
-      onValue(ref(firebaseDB, `rooms/${this.data.room.firebaseId}`), (snap) => {
-         const data = snap.val();
-         const currentState = this.getState();
-         const newState = currentState;
-         newState.room = { ...currentState.room, ...data };
-         this.setState(newState);
-         this.subscribed.forEach((f) => {
-            f();
+      const currentState = this.getState();
+      const { firebaseId } = currentState.room;
+      if (firebaseId) {
+         onValue(ref(firebaseDB, `rooms/${firebaseId}`), (snap) => {
+            const data = snap.val();
+            const newState = currentState;
+            newState.room = { ...currentState.room, ...data };
+            this.setState(newState);
+            this.subscribed.forEach((f) => {
+               f();
+            });
          });
-      });
+         this.data.databaseConnection = true;
+      }
    },
 
    getState() {
@@ -285,12 +290,13 @@ const state = {
          if (userMove && opponentMove) {
             result = resultsMap[userMove][opponentMove];
          }
-         if (!userMove) {
+         if (!userMove && opponentMove) {
             result = "lose";
          }
-         if (!opponentMove) {
+         if (!opponentMove && userMove) {
             result = "win";
-         } else {
+         }
+         if (!opponentMove && !userMove) {
             result = "tie";
          }
 

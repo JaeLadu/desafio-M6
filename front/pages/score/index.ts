@@ -11,6 +11,13 @@ function initScorePage() {
          state.subscribe(() => this.connectedCallback);
       }
 
+      onBeforeEnter() {
+         const { databaseConnection } = state.getState();
+         if (!databaseConnection) {
+            state.updateRoomData();
+         }
+      }
+
       async connectedCallback() {
          await state.setWinner();
          const currentState = state.getState();

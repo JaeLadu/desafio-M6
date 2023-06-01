@@ -210,7 +210,7 @@ const state = {
       }
    },
 
-   async changeUserStatus(status: { connected: boolean } | { start: boolean }) {
+   async changeUserStatus(status: { connected: boolean; start: boolean }) {
       const currentState = this.getState();
       if (currentState.room.firebaseId) {
          const response = await fetch(

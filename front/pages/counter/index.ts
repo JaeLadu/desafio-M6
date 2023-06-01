@@ -8,36 +8,36 @@ function initMountPlayPage() {
       }
 
       connectedCallback() {
-         const counter = document.createElement("counter-comp");
-         counter.addEventListener("timeUp", (e) => {
+         const counterEl = document.createElement("counter-comp");
+         counterEl.addEventListener("timeUp", (e) => {
             Router.go("/result");
          });
 
-         const moveSelector = document.createElement("move-selector-comp");
-         moveSelector.setAttribute("big", "yes");
-         moveSelector.shadowRoot?.addEventListener(
+         const moveSelectorContainerEl = document.createElement("div");
+         moveSelectorContainerEl.classList.add("container");
+
+         const moveSelectorEl = document.createElement("move-selector-comp");
+         moveSelectorEl.setAttribute("big", "yes");
+         moveSelectorEl.shadowRoot?.addEventListener(
             "selected",
             (e: CustomEventInit) => {
                state.updateCurrentPlay("", e.detail);
             }
          );
 
-         const container = document.createElement("div");
-         container.classList.add("container");
-
          const style = document.createElement("style");
          style.textContent = `
-         .container{
-            min-height: 80vh;
-            width: 100%;
+         mount-play-page{
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
+            gap:25vh;
          }
          `;
-         container.append(counter, moveSelector);
-         this.append(container, style);
+
+         moveSelectorContainerEl.append(moveSelectorEl);
+         this.append(counterEl, moveSelectorContainerEl, style);
       }
    }
 

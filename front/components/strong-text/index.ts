@@ -1,5 +1,5 @@
-function initText() {
-   class Text extends HTMLElement {
+function initStrongText() {
+   class StrongText extends HTMLElement {
       constructor() {
          super();
       }
@@ -8,6 +8,7 @@ function initText() {
          if (this.isConnected) {
             const div = document.createElement("div");
             const content = document.createElement("p");
+            const style = document.createElement("style");
             let color = "black";
             if (this.hasAttribute("color")) {
                color = this.getAttribute("color");
@@ -17,8 +18,6 @@ function initText() {
                size = this.getAttribute("size");
             }
 
-            const style = document.createElement("style");
-
             content.innerHTML = this.textContent || "Un texto";
 
             style.textContent = `
@@ -26,9 +25,9 @@ function initText() {
                  color: ${color};
                  margin: 0;
                  text-align: center;
-                 font-family: 'Odibee Sans';
+                 font-family: 'Roboto Slab';
                  font-style: normal;
-                 font-weight: 600;
+                 font-weight: 700;
                  font-size: ${size};
                 }
                  `;
@@ -38,6 +37,6 @@ function initText() {
       }
    }
 
-   customElements.define("text-comp", Text);
+   customElements.define("strong-text-comp", StrongText);
 }
-export { initText };
+export { initStrongText };

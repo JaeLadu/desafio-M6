@@ -15,11 +15,14 @@ function initWaitPlayPage() {
          }
       }
 
-      async connectedCallback() {
-         await state.changeUserStatus({ start: true });
+      connectedCallback() {
+         state.changeUserStatus({ start: true, connected: true });
          this.startPlay();
          const currentState = state.getState();
-         const opponent = currentState.room.users.find((user) => !user.owner);
+         const userId = currentState.user.id;
+         const opponent = currentState.room.users.find(
+            (user) => user.id != userId
+         );
 
          const headerEl = document.createElement("header-comp");
          const textEl = document.createElement("text-comp");
@@ -31,7 +34,18 @@ function initWaitPlayPage() {
          buttonEl.setAttribute("text", "Volver");
          buttonEl.setAttribute("target", "/start");
 
-         this.append(headerEl, textEl, buttonEl, moveSelectorEl);
+         const style = document.createElement("style");
+         style.textContent = `
+            wait-play-page{
+               height: 100vh;
+               display: flex;
+               flex-direction: column;
+               justify-content: space-between;
+
+            }
+         `;
+
+         this.append(headerEl, textEl, buttonEl, moveSelectorEl, style);
       }
 
       startPlay() {

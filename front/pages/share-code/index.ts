@@ -19,27 +19,46 @@ function initShareCodePage() {
          state.changeUserStatus({ connected: true, start: false });
 
          const headerEl = document.createElement("header-comp");
+         const mainContainerEl = document.createElement("div");
          const firstTextEl = document.createElement("text-comp");
          const secondTextEl = document.createElement("text-comp");
-         const codeEl = document.createElement("h3");
+         const codeEl = document.createElement("strong-text-comp");
          const backButtonEl = document.createElement("button-comp");
+         const moveSelectorContainerEl = document.createElement("div");
          const moveSelectorEl = document.createElement("move-selector-comp");
          const currentState = state.getState();
+         const style = document.createElement("style");
 
          firstTextEl.textContent = "Compartí el código:";
          codeEl.textContent = currentState.room.shortId;
          secondTextEl.textContent = "Con tu contrincante";
          backButtonEl.setAttribute("text", "Volver");
          backButtonEl.setAttribute("target", "/start");
-
-         this.append(
-            headerEl,
+         moveSelectorContainerEl.append(moveSelectorEl);
+         mainContainerEl.classList.add("main-container");
+         mainContainerEl.append(
             firstTextEl,
             codeEl,
             secondTextEl,
-            backButtonEl,
-            moveSelectorEl
+            backButtonEl
          );
+
+         style.textContent = `
+            share-code-page{
+               height: 100vh;
+               display: flex;
+               flex-direction: column;
+               justify-content: space-between;
+            }
+            .main-container{
+               text-align: center;
+               display: flex;
+               flex-direction: column;
+               gap: 20px;
+            }
+         `;
+
+         this.append(headerEl, mainContainerEl, moveSelectorContainerEl, style);
       }
 
       enterRoom() {

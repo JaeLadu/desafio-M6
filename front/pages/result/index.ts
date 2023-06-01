@@ -45,23 +45,24 @@ function initResultPage() {
          const style = document.createElement("style");
 
          style.textContent = `
-   .container{
-      width:100%;
-   }
-   .opponent{
-      height:50vh;
-      position: absolute;
-      top: -15px;
-      transform: rotate(180deg);
-   }
-   .user{
-      height:50vh;
-      position: absolute;
-      bottom: -15px;
-   }
+
+         .container{
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+         }
+         .opponent{
+            height: 45vh;
+            transform: rotate(180deg)
+         }
+         .user{
+            height: 45vh;
+         }
    `;
 
-         this.append(opponentMove, userMove, style);
+         container.append(opponentMove, userMove);
+         this.append(container, style);
       }
    }
    customElements.define("result-page", ResultPage);

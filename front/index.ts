@@ -3,6 +3,8 @@ import { initCounter } from "./components/counter";
 import { initForm } from "./components/form";
 import { initHeader } from "./components/header";
 import { initMoveSelector } from "./components/move-selector";
+import { initSecondaryText } from "./components/secondary-text";
+import { initStrongText } from "./components/strong-text";
 import { initText } from "./components/text";
 import { initTitle } from "./components/title";
 import { initAccessRoomPage } from "./pages/ access-room";
@@ -23,6 +25,8 @@ import { state } from "./state";
    initButton();
    initMoveSelector();
    initText();
+   initSecondaryText();
+   initStrongText();
    initCounter();
    initForm();
    initHeader();
@@ -40,8 +44,10 @@ import { state } from "./state";
       document.querySelector(".root") || document.createElement("div");
 
    initRouter(root);
+
    window.addEventListener("beforeunload", () => {
       console.log("unload");
+      state.changeUserStatus({ connected: false, start: false });
       const currentState = state.getState();
       currentState.databaseConnection = false;
       state.setState(currentState);

@@ -23,32 +23,30 @@ function initHeader() {
          }
 
          currentState.room.users.forEach((user) => {
-            const spanEl = document.createElement("span");
-            spanEl.textContent = `${user.name}: ${user.score || 0}`;
+            const textEl = document.createElement("secondary-text-comp");
+            textEl.textContent = `${user.name}: ${user.score || 0}`;
             if (user.id == owner) {
-               spanEl.classList.add("owner");
+               textEl.setAttribute("color", "red");
             }
-            scoreEl.append(spanEl);
+            scoreEl.append(textEl);
          });
 
          roomCodeEl.innerHTML = `
-            <span>Sala</span>
-         <span>${currentState.room.shortId}</span>
+            <strong-text-comp size= 24px>Sala</strong-text-comp>
+         <secondary-text-comp size= 24px>${currentState.room.shortId}</secondary-text-comp>
          
          `;
 
          style.textContent = `
          header{
-            width:95vw;
+            margin-top: 15px;
+            width:90vw;
             display:flex;
             justify-content: space-between;
         }
         div{
             display:flex;
             flex-direction: column;
-         }
-         .owner{
-            color:red;
          }
          `;
 

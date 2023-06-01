@@ -45,14 +45,16 @@ function initScorePage() {
          }
          const scoreEl = document.createElement("div");
          scoreEl.classList.add("score");
-         const scoreTitleEl = document.createElement("div");
+         const scoreTitleEl = document.createElement("text-comp");
          scoreTitleEl.classList.add("score__title");
          scoreTitleEl.textContent = "SCORE";
+         scoreTitleEl.setAttribute("size", "55px");
          const scoreContainerEl = document.createElement("div");
          scoreContainerEl.classList.add("score__container");
          currentState.room.users.forEach((user) => {
-            const spanEl = document.createElement("span");
+            const spanEl = document.createElement("text-comp");
             spanEl.textContent = `${user.name}: ${user.score}`;
+            spanEl.setAttribute("size", "45px");
             scoreContainerEl.append(spanEl);
          });
          scoreEl.append(scoreTitleEl, scoreContainerEl);
@@ -61,7 +63,7 @@ function initScorePage() {
          playAgainButtonEl.setAttribute("text", "Volver a jugar");
          playAgainButtonEl.setAttribute("target", "/play");
          playAgainButtonEl.addEventListener("click", (e) =>
-            state.changeUserStatus({ start: false })
+            state.changeUserStatus({ start: false, connected: true })
          );
 
          const exitButtonEl = document.createElement("button-comp");
@@ -114,7 +116,7 @@ function initScorePage() {
               text-align: end;
               font-size: 45px;
           }
-          @media screen and (min-width: 400px){
+          @media screen and (min-width: 440px){
               .star{
                   max-width: 20vw;
               }

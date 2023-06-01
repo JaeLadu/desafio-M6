@@ -8,7 +8,7 @@ function initAccessRoomPage() {
       }
 
       connectedCallback() {
-         state.changeUserStatus({ connected: false });
+         state.changeUserStatus({ connected: false, start: false });
 
          const titleEl = document.createElement("title-comp");
          titleEl.textContent =
@@ -20,9 +20,6 @@ function initAccessRoomPage() {
          formEl.shadowRoot.addEventListener(
             "customSubmit",
             async (e: CustomEvent) => {
-               // e.preventDefault();
-
-               // const formData = new FormData(formEl.querySelector("form"));
                const formData = e.detail;
                formData.append("code", formData.get("Código"));
                const data = Object.fromEntries(formData.entries());
@@ -44,7 +41,15 @@ function initAccessRoomPage() {
          backButtonEl.setAttribute("text", "Volver");
          backButtonEl.setAttribute("target", "/start");
 
-         this.append(titleEl, formEl, backButtonEl);
+         const style = document.createElement("style");
+         style.textContent = `
+            access-room-page{
+               display: flex;
+               flex-direction: column;
+               gap: 20px;
+            }
+         `;
+         this.append(titleEl, formEl, backButtonEl, style);
       }
    }
    customElements.define("access-room-page", AccessRoomPage);

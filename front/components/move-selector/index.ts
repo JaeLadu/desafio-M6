@@ -72,7 +72,7 @@ function initMoveSelector() {
                 height:100%
             }
             .big{
-               height:35vh;
+               height: 64vw;
             }
             .play{
                height:100%;

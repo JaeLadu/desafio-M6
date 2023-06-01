@@ -25,9 +25,12 @@ function initWaitPlayPage() {
          );
 
          const headerEl = document.createElement("header-comp");
+         const mainContainerEl = document.createElement("div");
          const textEl = document.createElement("text-comp");
          const buttonEl = document.createElement("button-comp");
          const moveSelectorEl = document.createElement("move-selector-comp");
+
+         mainContainerEl.classList.add("main-container");
 
          textEl.textContent = `Esperando a que ${opponent.name} presione Jugar`;
 
@@ -41,11 +44,24 @@ function initWaitPlayPage() {
                display: flex;
                flex-direction: column;
                justify-content: space-between;
+               
+            }
+            .main-container{
+               display: flex;
+               flex-direction: column;
+               gap:20px;
 
             }
+            @media screen and (min-width: 440px){
+               .main-container{
+                  max-width: 65vw;
+                  margin: auto;
+               }
+
          `;
 
-         this.append(headerEl, textEl, buttonEl, moveSelectorEl, style);
+         mainContainerEl.append(textEl, buttonEl);
+         this.append(headerEl, mainContainerEl, moveSelectorEl, style);
       }
 
       startPlay() {

@@ -32,7 +32,7 @@ function initButton() {
                font-size: 45px;
                color: #D8FCFC;
             }
-            @media screen and (min-width: 400px){
+            @media screen and (min-width: 440px){
                button{
                   min-width:0;
                }

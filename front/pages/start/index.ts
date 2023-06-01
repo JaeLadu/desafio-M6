@@ -40,6 +40,10 @@ function initStart() {
 
          const style = document.createElement("style");
          style.textContent = `
+            start-page{
+               height: 100vh;
+
+            }
             .container{
                height: 100vh;
                width: 100%;
@@ -47,9 +51,8 @@ function initStart() {
                flex-direction: column; 
                align-items: center;
                justify-content: space-between;
-               gap: 5vh;
             }
-            @media screen and (min-width: 400px){
+            @media screen and (min-width: 440px){
                .container{
                   width: 375px;
                }

@@ -80,9 +80,12 @@ function initMoveSelector() {
             .unselected{
                opacity: 0.5;
             }
-            @media screen and (min-width: 400px){
+            @media screen and (min-width: 440px){
                .container{
                   justify-content: space-between;
+               }
+               .big{
+                  height: 40vh;
                }
             }
             `;

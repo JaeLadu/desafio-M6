@@ -56,6 +56,13 @@ function initShareCodePage() {
                flex-direction: column;
                gap: 20px;
             }
+            @media screen and (min-width: 440px){
+               .main-container{
+                  max-width: 55vw;
+                  margin: auto;
+               }
+            }
+
          `;
 
          this.append(headerEl, mainContainerEl, moveSelectorContainerEl, style);

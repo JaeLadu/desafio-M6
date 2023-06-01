@@ -53,6 +53,12 @@ function initPlayPage() {
                flex-direction: column;
                gap: 30px;
             }
+            @media screen and (min-width: 440px){
+               .main-container{
+                  max-width: 55vw;
+                  margin: auto;
+               }
+
          `;
 
          mainContainerEl.append(textEl, playButtonEl, backButtonEl);

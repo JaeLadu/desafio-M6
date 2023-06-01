@@ -34,6 +34,14 @@ function initMountPlayPage() {
             justify-content: flex-end;
             gap:25vh;
          }
+         @media screen and (min-width: 440px){
+            mount-play-page{
+               gap: 15vh;
+            }
+            .container{
+               width:65vw;
+            }
+
          `;
 
          moveSelectorContainerEl.append(moveSelectorEl);

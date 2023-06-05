@@ -1,6 +1,6 @@
 import { database, firestore } from "firebase-admin";
 import { applicationDefault, initializeApp } from "firebase-admin/app";
-const key = require("./firebaseKey.json");
+// const key = require("./firebaseKey.json"); line needed if importing from json file key
 
 //environment saved key
 const app = initializeApp({

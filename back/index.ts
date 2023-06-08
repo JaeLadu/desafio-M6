@@ -5,6 +5,7 @@ import {
    firebaseDatabase as firebaseDB,
    firestoreDatabase as firestoreDB,
 } from "./database";
+import path from "path";
 
 const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 4); //configura que caracteres y que cantidad debe generar nano cuando se lo llame
 const app = express();
@@ -329,6 +330,12 @@ app.patch("/:roomId/:playId", async (req, res) => {
    return res.send(currentPlayTransaction.snapshot);
 });
 
-app.use("*", express.static(`${ROOT_PATH}/dist`));
+app.use(express.static(`dist`));
+
+const rute = path.resolve(__dirname, "../dist/", "index.html");
+
+app.get("*", (req, res) => {
+   res.sendFile(rute);
+});
 
 app.listen(PORT, () => console.log(`app escuchando en el puerto ${PORT}`));

@@ -30,10 +30,19 @@ app.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "Information missing" });
    }
 
-   //habla con la DB, crea el usuario y devuelve el ID
-   const firestoreId = await firestoreDB.collection("/users").add(req.body);
+   //chequea si el user ya existe, si es así, lo devuelve con su ID, sino crea el usuario y lo devuelve
+   const snapshot = await firestoreDB
+      .collection("/users")
+      .where("mail", "==", mail)
+      .get();
+   const exists = snapshot.docs.length > 0;
 
-   return res.json({ id: firestoreId.id, name, mail });
+   if (exists) {
+      return res.json({ ...snapshot.docs[0].data(), id: snapshot.docs[0].id });
+   } else {
+      const firestoreId = await firestoreDB.collection("/users").add(req.body);
+      return res.json({ id: firestoreId.id, name, mail });
+   }
 });
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -244,28 +253,62 @@ app.post("/:roomId/play", async (req, res) => {
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //método que recibe información sobre las jugadas, tanto la selección de cualquiera de los jugadores (piedra, papel o tijera), cómo quien es el ganador
-//y usa esta info para actualizar firebase
+//y usa esta info para actualizar firebase y firestore
 app.patch("/:roomId/:playId", async (req, res) => {
    const { roomId, playId } = req.params;
    const { move, player, winner } = req.body;
-   const roomRef = firebaseDB.ref(`rooms/${roomId}`);
-   const currentPlay = (await roomRef.child("currentPlay").get()).val();
-   let users = (await roomRef.child("users").get()).val();
+   //firebase
+   const firebaseRoomRef = firebaseDB.ref(`rooms/${roomId}`);
+   const currentPlay = (await firebaseRoomRef.child("currentPlay").get()).val();
+   let firebaseUsers = (await firebaseRoomRef.child("users").get()).val();
+   //firestore
+   const snapshot = await firestoreDB
+      .collection("rooms")
+      .where("firebaseId", "==", roomId)
+      .get();
+
+   const firestoreRoom = snapshot.docs[0].data();
+   const firestoreRoomId = snapshot.docs[0].id;
+   let firestoreUsers = firestoreRoom.users;
+
+   //antes de actualizar el score se asegura de que ambos usuarios tengan una key "score"
+   //firebase
+   const firebaseScoreMissing = firebaseUsers.find((u) => !("score" in u));
+   if (firebaseScoreMissing) {
+      firebaseUsers = firebaseUsers.map((u) => ({ ...u, score: 0 }));
+   }
+
+   //firestore
+   const firestoreScoreMissing = firestoreUsers.find((u) => !("score" in u));
+   if (firestoreScoreMissing) {
+      firestoreUsers = firestoreUsers.map((u) => ({ ...u, score: 0 }));
+   }
 
    if (winner) {
       currentPlay.winner = winner;
       if (winner != "tie") {
-         //antes de actualizar el score se asegura de que ambos usuarios tengan una key "score"
-         const scoreMissing = users.find((u) => !("score" in u));
-         if (scoreMissing) {
-            users = users.map((u) => ({ ...u, score: 0 }));
-         }
          //busca el index del usuario que ganó
-         const winnerIndex = users.findIndex((u) => u.id == winner);
+         //firebase
+         const firebaseWinnerIndex = firebaseUsers.findIndex(
+            (u) => u.id == winner
+         );
+
+         //firestore
+         const firestoreWinnerIndex = firestoreUsers.findIndex(
+            (u) => u.id == winner
+         );
 
          //actualiza el score del winner
-         users[winnerIndex].score++;
-         await roomRef.child("users").transaction(() => users);
+         //firebase
+         firebaseUsers[firebaseWinnerIndex].score++;
+         await firebaseRoomRef.child("users").transaction(() => firebaseUsers);
+
+         //firestore
+         firestoreUsers[firestoreWinnerIndex].score++;
+         firestoreDB
+            .collection("rooms")
+            .doc(firestoreRoomId)
+            .update({ users: firestoreUsers });
       }
    }
    if (move) {
@@ -273,12 +316,12 @@ app.patch("/:roomId/:playId", async (req, res) => {
    }
 
    //actualiza la jugada actual
-   const currentPlayTransaction = await roomRef
+   const currentPlayTransaction = await firebaseRoomRef
       .child("currentPlay")
       .transaction(() => currentPlay);
 
    //actualiza la jugada dentro de la lista de jugadas
-   await roomRef
+   await firebaseRoomRef
       .child("playsList")
       .child(currentPlay.id)
       .transaction(() => currentPlay);

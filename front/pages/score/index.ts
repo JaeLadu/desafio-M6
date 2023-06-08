@@ -20,6 +20,7 @@ function initScorePage() {
 
       async connectedCallback() {
          await state.setWinner();
+         await state.changeUserStatus({ connected: true, start: false });
          const currentState = state.getState();
          const winner = currentState.room.currentPlay.winner;
          const container = document.createElement("div");
@@ -62,9 +63,6 @@ function initScorePage() {
          const playAgainButtonEl = document.createElement("button-comp");
          playAgainButtonEl.setAttribute("text", "Volver a jugar");
          playAgainButtonEl.setAttribute("target", "/play");
-         playAgainButtonEl.addEventListener("click", (e) =>
-            state.changeUserStatus({ start: false, connected: true })
-         );
 
          const exitButtonEl = document.createElement("button-comp");
          exitButtonEl.setAttribute("text", "Salir");

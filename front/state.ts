@@ -48,8 +48,8 @@ const state = {
 
    checkLocalStorage() {
       const localData = localStorage.getItem("multiplayerRockPaperScissors");
-      const localObject = JSON.parse(localData);
-      if (localObject) {
+      if (localData) {
+         const localObject = JSON.parse(localData);
          this.data = { ...localObject };
       }
    },
